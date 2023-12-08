@@ -4,11 +4,10 @@
     'lst': typing.Sequence[typing.Any],
     'return': typing.Union[typing.Any, NoneType]
 }"""
-from types import NoneType
 from typing import Sequence, Any, Union
 
 
-def safe_first_element(lst: Sequence[Any]) -> Union[Any, NoneType]:
+def safe_first_element(lst: Sequence[Any]) -> Union[Any, None]:
     """this function returns the first element of a sequence object if any was
     passed or None if nothing was passed"""
     if lst:
