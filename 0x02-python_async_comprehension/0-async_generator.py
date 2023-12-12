@@ -9,5 +9,5 @@ async def async_generator() -> AsyncGenerator[float, None]:
     """This AsyncGenerator returns 10 random floats between 0 and 10 every
     second"""
     for _ in range(10):
-        yield random.random() * 10
         await asyncio.sleep(1)
+        yield random.random() * 10
