@@ -2,10 +2,10 @@
 """ Unit testing for utils """
 
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 from parameterized import parameterized
 import requests
-from utils import access_nested_map, get_json
+from utils import access_nested_map, get_json, memoize
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -54,3 +54,33 @@ class TestGetJson(unittest.TestCase):
         requests.get = Mock(return_value=MockObj(test_payload))
         value = get_json(test_url)
         self.assertEqual(value, test_payload)
+
+
+class TestMemoize(unittest.TestCase):
+    """ Testing memoized decorator """
+
+    def test_memoize(self):
+        """ Test the decorator """
+
+        class TestClass:
+            """ Testing class """
+
+            def a_method(self):
+                """ testing method """
+                return 42
+
+            @memoize
+            def a_property(self):
+                """ testing property """
+                return self.a_method()
+
+
+        obj = TestClass()
+        self.assertEqual(obj.a_property, 42)
+        self.assertEqual(obj.a_property, 42)
+
+        obj = TestClass()
+        with patch.object(obj, 'a_method') as mock:
+            obj.a_property
+            obj.a_property
+            mock.assert_called_once()
