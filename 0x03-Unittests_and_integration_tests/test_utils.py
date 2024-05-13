@@ -2,12 +2,14 @@
 """ Unit testing for utils """
 
 import unittest
+from unittest.mock import Mock
 from parameterized import parameterized
-from utils import access_nested_map
+import requests
+from utils import access_nested_map, get_json
 
 
 class TestAccessNestedMap(unittest.TestCase):
-    """ Testing for access_nested_map function """
+    """ Testing access_nested_map function """
 
     @parameterized.expand([
         ({"a": 1}, ("a", ), 1),
@@ -27,3 +29,28 @@ class TestAccessNestedMap(unittest.TestCase):
         with self.assertRaises(KeyError) as err:
             access_nested_map(nested, path)
         self.assertEqual((key, ), err.exception.args)
+
+
+class TestGetJson(unittest.TestCase):
+    """ Testing get_json function """
+
+    @parameterized.expand([
+        ('http://example.com', {'payload': True}),
+        ('http://holberton.io', {'payload': False}),
+    ])
+    def test_get_json(self, test_url, test_payload):
+        """ Test get_json function for results """
+
+        class MockObj:
+            """ Mock Object For Testing """
+
+            def __init__(self, payload):
+                self.__payload = payload
+
+            def json(self):
+                """ return mock json payload """
+                return self.__payload
+
+        requests.get = Mock(return_value=MockObj(test_payload))
+        value = get_json(test_url)
+        self.assertEqual(value, test_payload)
