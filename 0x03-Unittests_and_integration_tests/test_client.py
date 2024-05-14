@@ -92,7 +92,7 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         cls.mock_get.side_effect = [
             MockResponse(cls.org_payload),
             MockResponse(cls.repos_payload),
-        ]
+        ] * 2
 
     @classmethod
     def tearDownClass(cls):
@@ -104,3 +104,10 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         obj = GithubOrgClient('a7a')
         repos = obj.public_repos()
         self.assertEqual(repos, self.expected_repos)
+
+    def test_public_repos_with_license(self):
+        """ Testing public_repos_with_licence method """
+        obj = GithubOrgClient('a7a')
+        repos = obj.public_repos('apache-2.0')
+        self.assertEqual(repos, self.apache2_repos)
+
