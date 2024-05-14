@@ -110,4 +110,3 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         obj = GithubOrgClient('a7a')
         repos = obj.public_repos('apache-2.0')
         self.assertEqual(repos, self.apache2_repos)
-
