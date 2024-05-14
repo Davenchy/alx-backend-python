@@ -1,10 +1,22 @@
 #!/usr/bin/env python3
 """ Testing client.py """
 import unittest
-from parameterized import parameterized
+from parameterized import parameterized, parameterized_class
 from unittest.mock import patch, PropertyMock
 import client
 from client import GithubOrgClient
+from fixtures import TEST_PAYLOAD
+
+
+class MockResponse:
+    """ A mock response object as a result for requests.get """
+
+    def __init__(self, payload):
+        self._payload = payload
+
+    def json(self):
+        """ returns the payload as a json """
+        return self._payload
 
 
 class TestGithubOrgClient(unittest.TestCase):
@@ -52,3 +64,33 @@ class TestGithubOrgClient(unittest.TestCase):
 
             json_mock.assert_called_once()
             public_mock.assert_called_once()
+
+
+@parameterized_class(
+    ('org_payload', 'repos_payload', 'expected_repos', 'apache2_repos'),
+    TEST_PAYLOAD,
+)
+class TestIntegrationGithubOrgClient(unittest.TestCase):
+    """ Integration Testing for GithubOrgClient """
+
+    @classmethod
+    def setUpClass(cls):
+        """ Setup testing mocks """
+        cls.get_patcher = patch('requests.get')
+
+        cls.mock_get = cls.get_patcher.start()
+        cls.mock_get.side_effect = [
+            MockResponse(cls.org_payload),
+            MockResponse(cls.repos_payload),
+        ]
+
+    @classmethod
+    def tearDownClass(cls):
+        """ Stop testing mocks """
+        cls.get_patcher.stop()
+
+    def test_public_repos(self):
+        """ Testing public_repos method """
+        obj = GithubOrgClient('a7a')
+        repos = obj.public_repos()
+        self.assertEqual(repos, self.expected_repos)
